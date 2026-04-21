@@ -1,24 +1,23 @@
-# Alpha Inversiones — Calculadora de Fechas de Inversión
+# Alpha Inversiones — Calculadora de Fechas
 
-API y aplicación web para calcular las fechas de inicio y fin de inversiones en el mercado de valores.
-
----
+Aplicación fullstack para calcular fechas de inicio y fin de inversiones financieras, considerando días hábiles y feriados de República Dominicana.
 
 ## Stack
 
-| Capa | Tecnología |
-|------|-----------|
-| Backend | Python 3.11, Django 4.2, Django REST Framework, SimpleJWT |
-| Base de datos | PostgreSQL 15 |
-| Frontend | React 18, TypeScript, Vite |
-| Despliegue | Docker + docker-compose |
+| Capa       | Tecnología                          |
+|------------|-------------------------------------|
+| Backend    | Django 4.2 + Django REST Framework  |
+| Auth       | JWT (djangorestframework-simplejwt) |
+| Base de datos | PostgreSQL 15                    |
+| Frontend   | React 18 + TypeScript               |
+| Contenedores | Docker + docker-compose           |
 
 ---
 
 ## Levantar con Docker (recomendado)
 
-### Prerrequisitos
-- Docker Desktop (o Docker Engine + Compose v2)
+### Prerequisitos
+- Docker Desktop instalado y corriendo
 
 ### Pasos
 
@@ -28,29 +27,22 @@ git clone <url-del-repo>
 cd alpha-inversiones
 
 # 2. Levantar todos los servicios
-docker compose up --build
+docker-compose up --build
 ```
 
-Al iniciar, el backend automáticamente:
-1. Espera que PostgreSQL esté listo.
-2. Ejecuta las migraciones.
-3. Carga datos iniciales (usuarios, producto de ejemplo, feriados RD 2022–2027).
-4. Levanta el servidor con Gunicorn.
+Los servicios quedan disponibles en:
 
-| Servicio | URL |
-|---------|-----|
-| Frontend (React) | http://localhost:3000 |
-| Backend API | http://localhost:8001/api/ |
-| Django Admin | http://localhost:8001/admin/ |
+| Servicio        | URL                          |
+|----------------|-------------------------------|
+| Frontend        | http://localhost:3000         |
+| API Backend     | http://localhost:8000/api/    |
+| Django Admin    | http://localhost:8000/admin/  |
 
----
+### Credenciales por defecto
 
-## Credenciales de prueba
-
-| Usuario | Contraseña | Rol |
-|---------|-----------|-----|
-| `admin` | `Admin1234!` | Superusuario (acceso al admin) |
-| `inversor` | `Inversor1234!` | Usuario de API |
+| Usuario | Contraseña |
+|---------|-----------|
+| admin   | admin123  |
 
 ---
 
@@ -61,23 +53,25 @@ Al iniciar, el backend automáticamente:
 ```bash
 cd backend
 
-# Crear y activar entorno virtual
+# Crear entorno virtual
 python -m venv venv
-source venv/bin/activate        # Linux / Mac
-# venv\Scripts\activate         # Windows
+source venv/bin/activate   # Windows: venv\Scripts\activate
 
 # Instalar dependencias
 pip install -r requirements.txt
 
-# Configurar variables de entorno
-cp .env.example .env
-# Editar .env con los datos de tu PostgreSQL local
+# Configurar variables de entorno (opcional, hay defaults)
+# Crear .env con:
+# DB_HOST=localhost
+# DB_USER=postgres
+# DB_PASSWORD=postgres
 
 # Migraciones y datos iniciales
 python manage.py migrate
-python manage.py setup_initial_data
+python manage.py loaddata fixtures/initial_data.json
+python manage.py createsuperuser
 
-# Iniciar servidor
+# Correr servidor
 python manage.py runserver
 ```
 
@@ -86,47 +80,50 @@ python manage.py runserver
 ```bash
 cd frontend
 npm install
-npm run dev
+REACT_APP_API_URL=http://localhost:8000 npm start
 ```
-
-Abrir http://localhost:5173 en el navegador. El proxy de Vite redirige `/api` hacia `http://localhost:8000`.
 
 ---
 
-## Endpoints del API
+## API Endpoints
 
 ### Autenticación
 
-```
-POST /api/token/
-Body: { "username": "...", "password": "..." }
-Response: { "access": "<jwt>", "refresh": "<jwt>" }
+```http
+POST /api/auth/token/
+Content-Type: application/json
 
-POST /api/token/refresh/
-Body: { "refresh": "<jwt>" }
-Response: { "access": "<jwt>" }
-```
-
-### Recursos protegidos (requieren `Authorization: Bearer <access_token>`)
-
-```
-GET  /api/productos/         → Lista de productos disponibles
-POST /api/calcular/          → Cálculo de fechas de inversión
+{
+  "username": "admin",
+  "password": "admin123"
+}
 ```
 
-#### Ejemplo de cálculo
+### Listar productos
 
-```json
-// Request
-POST /api/calcular/
+```http
+GET /api/productos/
+Authorization: Bearer <access_token>
+```
+
+### Calcular fechas de inversión
+
+```http
+POST /api/inversiones/calcular/
+Authorization: Bearer <access_token>
+Content-Type: application/json
+
 {
   "producto": 1,
   "enReinversion": false,
   "plazo": 33,
   "fechaCreacion": "2022-07-12 09:00:00"
 }
+```
 
-// Response
+**Respuesta:**
+
+```json
 {
   "producto": 1,
   "plazo": 33,
@@ -138,50 +135,58 @@ POST /api/calcular/
 
 ---
 
-## Lógica de cálculo
+## Lógica de Cálculo
 
-### Fecha Inicio
-Se obtiene sumando **N días hábiles** a `fechaCreacion`. El valor de N depende del producto:
+1. **fechaInicio** = `fechaCreacion` + N días **hábiles** del producto  
+   (N depende del horario operativo y si es reinversión)
 
-| Condición | Días |
-|-----------|------|
-| Hora creación ≤ hora operativa, no reinversión | `days_on_time` |
-| Hora creación > hora operativa, no reinversión | `days_late` |
-| Hora creación ≤ hora operativa, reinversión | `days_on_time_reinvestment` |
-| Hora creación > hora operativa, reinversión | `days_late_reinvestment` |
+2. **fechaFin** = `fechaInicio` + `plazo` días **calendario**  
+   → Si cae en fin de semana o feriado, se mueve al siguiente día hábil
 
-### Fecha Fin
-Se suman los **días de plazo (calendario)** a `fechaInicio`. Si el resultado cae en fin de semana o feriado, se avanza al próximo día hábil.
-
-### Plazo Real
-Diferencia en días calendario entre `fechaFin` y `fechaInicio`.
-
-### Días hábiles
-No se contabilizan sábados, domingos ni los días feriados cargados en la base de datos. Los feriados se gestionan desde el **Django Admin → Días Feriados**.
+3. **plazoReal** = diferencia en días calendario entre `fechaFin` y `fechaInicio`
 
 ---
 
 ## Django Admin
 
-Acceder a http://localhost:8000/admin/ con el usuario `admin`.
+Accede a `http://localhost:8000/admin/` con las credenciales de administrador para gestionar:
 
-Desde el panel se puede gestionar:
-- **Usuarios** — crear, editar y desactivar usuarios del sistema.
-- **Productos** — configurar los productos con sus días de corte y hora operativa.
-- **Días Feriados** — registrar los feriados nacionales que se excluyen del cálculo.
+- **Usuarios** — crear y administrar usuarios del sistema
+- **Productos** — configurar productos con sus 4 parámetros de días
+- **Días Feriados** — registrar feriados de República Dominicana
+
+### Datos de prueba precargados
+
+El fixture `initial_data.json` incluye:
+- **Producto Demo** (ID 1): configuración del ejemplo de la prueba técnica
+- **Renta Fija** (ID 2): producto adicional de muestra
+- Feriados de RD para 2022–2025
 
 ---
 
-## Variables de entorno (backend)
+## Estructura del Proyecto
 
-| Variable | Descripción | Default |
-|----------|-------------|---------|
-| `SECRET_KEY` | Clave secreta de Django | valor de desarrollo |
-| `DEBUG` | Modo debug | `True` |
-| `ALLOWED_HOSTS` | Hosts permitidos (separados por coma) | `*` |
-| `DB_NAME` | Nombre de la base de datos | `alpha_inversiones` |
-| `DB_USER` | Usuario de PostgreSQL | `postgres` |
-| `DB_PASSWORD` | Contraseña de PostgreSQL | `postgres` |
-| `DB_HOST` | Host de PostgreSQL | `localhost` |
-| `DB_PORT` | Puerto de PostgreSQL | `5432` |
-| `CORS_ALLOWED_ORIGINS` | Orígenes CORS permitidos | `http://localhost:3000` |
+```
+alpha-inversiones/
+├── backend/
+│   ├── config/          # Configuración Django
+│   ├── inversiones/     # App principal
+│   │   ├── models.py    # Producto, DiaFeriado
+│   │   ├── services.py  # Lógica de cálculo de fechas
+│   │   ├── views.py     # API endpoints
+│   │   ├── serializers.py
+│   │   ├── urls.py
+│   │   └── admin.py
+│   ├── fixtures/        # Datos iniciales
+│   ├── Dockerfile
+│   └── requirements.txt
+├── frontend/
+│   ├── src/
+│   │   ├── pages/       # Login, Calculator
+│   │   ├── services/    # auth.ts, api.ts
+│   │   └── types/       # Interfaces TypeScript
+│   ├── Dockerfile
+│   └── nginx.conf
+├── docker-compose.yml
+└── README.md
+```

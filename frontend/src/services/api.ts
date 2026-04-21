@@ -1,42 +1,36 @@
 import axios from 'axios';
-import { authService } from './auth';
-import type { Product, InvestmentInput, InvestmentResult } from '../types';
+import { getAccessToken, logout } from './auth';
+import { Producto, CalcularFechasInput, CalcularFechasOutput } from '../types';
 
-const client = axios.create();
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
-// Attach JWT to every request
-client.interceptors.request.use((config) => {
-  const token = authService.getAccessToken();
+const api = axios.create({ baseURL: API_URL });
+
+api.interceptors.request.use((config) => {
+  const token = getAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
 
-// On 401 try to refresh once, then redirect to login
-client.interceptors.response.use(
-  (res) => res,
-  async (error) => {
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
     if (error.response?.status === 401) {
-      const refreshed = await authService.refreshToken();
-      if (refreshed) {
-        error.config.headers.Authorization = `Bearer ${authService.getAccessToken()}`;
-        return client.request(error.config);
-      }
+      logout();
       window.location.href = '/login';
     }
     return Promise.reject(error);
   }
 );
 
-export const apiService = {
-  async getProducts(): Promise<Product[]> {
-    const { data } = await client.get<Product[]>('/api/productos/');
-    return data;
-  },
+export const getProductos = async (): Promise<Producto[]> => {
+  const response = await api.get<Producto[]>('/api/productos/');
+  return response.data;
+};
 
-  async calculateDates(input: InvestmentInput): Promise<InvestmentResult> {
-    const { data } = await client.post<InvestmentResult>('/api/calcular/', input);
-    return data;
-  },
+export const calcularFechas = async (data: CalcularFechasInput): Promise<CalcularFechasOutput> => {
+  const response = await api.post<CalcularFechasOutput>('/api/inversiones/calcular/', data);
+  return response.data;
 };

@@ -1,27 +1,28 @@
+import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import CalculatorPage from './pages/CalculatorPage';
-import { authService } from './services/auth';
+import Login from './pages/Login';
+import Calculator from './pages/Calculator';
+import { isAuthenticated } from './services/auth';
 
-function PrivateRoute({ children }: { children: React.ReactNode }) {
-  return authService.isAuthenticated() ? <>{children}</> : <Navigate to="/login" replace />;
-}
+const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return isAuthenticated() ? <>{children}</> : <Navigate to="/login" replace />;
+};
 
-export default function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route
-          path="/"
-          element={
-            <PrivateRoute>
-              <CalculatorPage />
-            </PrivateRoute>
-          }
-        />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
-  );
-}
+const App: React.FC = () => (
+  <BrowserRouter>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route
+        path="/"
+        element={
+          <PrivateRoute>
+            <Calculator />
+          </PrivateRoute>
+        }
+      />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  </BrowserRouter>
+);
+
+export default App;

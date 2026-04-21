@@ -4,39 +4,31 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
-venv/
-env/
-.venv/
 *.egg-info/
 dist/
 build/
 .eggs/
+venv/
+env/
+.env
 
 # Django
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
 staticfiles/
-mediafiles/
-backend/.env
+*.sqlite3
 
-# Node / frontend
+# Node
 node_modules/
-frontend/dist/
-frontend/.env
-.npm
+frontend/build/
 
 # Docker
-.dockerignore
-
-# OS
-.DS_Store
-Thumbs.db
+.docker/
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-.claude/
+
+# OS
+.DS_Store
+Thumbs.db

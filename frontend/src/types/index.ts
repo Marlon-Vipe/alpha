@@ -1,17 +1,17 @@
-export interface Product {
+export interface Producto {
   id: number;
-  name: string;
-  operating_time: string;
+  nombre: string;
+  horario_operativo: string;
 }
 
-export interface InvestmentInput {
+export interface CalcularFechasInput {
   producto: number;
   enReinversion: boolean;
   plazo: number;
   fechaCreacion: string;
 }
 
-export interface InvestmentResult {
+export interface CalcularFechasOutput {
   producto: number;
   plazo: number;
   fechaInicio: string;

@@ -1,0 +1,163 @@
+[
+  {
+    "model": "inversiones.producto",
+    "pk": 1,
+    "fields": {
+      "nombre": "Producto Demo",
+      "horario_operativo": "10:30:00",
+      "dias_dentro_horario": 2,
+      "dias_fuera_horario": 3,
+      "dias_reinversion_dentro": 1,
+      "dias_reinversion_fuera": 2,
+      "activo": true
+    }
+  },
+  {
+    "model": "inversiones.producto",
+    "pk": 2,
+    "fields": {
+      "nombre": "Renta Fija",
+      "horario_operativo": "13:00:00",
+      "dias_dentro_horario": 1,
+      "dias_fuera_horario": 2,
+      "dias_reinversion_dentro": 0,
+      "dias_reinversion_fuera": 1,
+      "activo": true
+    }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 1,
+    "fields": { "fecha": "2022-01-01", "descripcion": "Año Nuevo" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 2,
+    "fields": { "fecha": "2022-01-06", "descripcion": "Día de Reyes" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 3,
+    "fields": { "fecha": "2022-01-21", "descripcion": "Día de la Altagracia" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 4,
+    "fields": { "fecha": "2022-01-26", "descripcion": "Día de Duarte" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 5,
+    "fields": { "fecha": "2022-02-27", "descripcion": "Día de la Independencia" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 6,
+    "fields": { "fecha": "2022-04-15", "descripcion": "Viernes Santo" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 7,
+    "fields": { "fecha": "2022-05-02", "descripcion": "Día del Trabajo" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 8,
+    "fields": { "fecha": "2022-06-16", "descripcion": "Corpus Christi" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 9,
+    "fields": { "fecha": "2022-08-16", "descripcion": "Día de la Restauración" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 10,
+    "fields": { "fecha": "2022-09-24", "descripcion": "Día de las Mercedes" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 11,
+    "fields": { "fecha": "2022-11-07", "descripcion": "Día de la Constitución" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 12,
+    "fields": { "fecha": "2022-12-25", "descripcion": "Navidad" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 13,
+    "fields": { "fecha": "2023-01-01", "descripcion": "Año Nuevo" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 14,
+    "fields": { "fecha": "2023-01-06", "descripcion": "Día de Reyes" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 15,
+    "fields": { "fecha": "2023-01-21", "descripcion": "Día de la Altagracia" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 16,
+    "fields": { "fecha": "2023-02-27", "descripcion": "Día de la Independencia" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 17,
+    "fields": { "fecha": "2023-04-07", "descripcion": "Viernes Santo" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 18,
+    "fields": { "fecha": "2023-05-01", "descripcion": "Día del Trabajo" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 19,
+    "fields": { "fecha": "2023-08-16", "descripcion": "Día de la Restauración" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 20,
+    "fields": { "fecha": "2023-09-24", "descripcion": "Día de las Mercedes" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 21,
+    "fields": { "fecha": "2023-12-25", "descripcion": "Navidad" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 22,
+    "fields": { "fecha": "2024-01-01", "descripcion": "Año Nuevo" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 23,
+    "fields": { "fecha": "2024-08-16", "descripcion": "Día de la Restauración" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 24,
+    "fields": { "fecha": "2024-12-25", "descripcion": "Navidad" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 25,
+    "fields": { "fecha": "2025-01-01", "descripcion": "Año Nuevo" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 26,
+    "fields": { "fecha": "2025-08-16", "descripcion": "Día de la Restauración" }
+  },
+  {
+    "model": "inversiones.diaFeriado",
+    "pk": 27,
+    "fields": { "fecha": "2025-12-25", "descripcion": "Navidad" }
+  }
+]

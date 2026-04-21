@@ -1,39 +1,26 @@
 import axios from 'axios';
-import type { AuthTokens } from '../types';
+import { AuthTokens } from '../types';
 
-const ACCESS_KEY = 'alpha_access';
-const REFRESH_KEY = 'alpha_refresh';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
-export const authService = {
-  async login(username: string, password: string): Promise<void> {
-    const { data } = await axios.post<AuthTokens>('/api/token/', { username, password });
-    localStorage.setItem(ACCESS_KEY, data.access);
-    localStorage.setItem(REFRESH_KEY, data.refresh);
-  },
-
-  logout(): void {
-    localStorage.removeItem(ACCESS_KEY);
-    localStorage.removeItem(REFRESH_KEY);
-  },
-
-  getAccessToken(): string | null {
-    return localStorage.getItem(ACCESS_KEY);
-  },
-
-  isAuthenticated(): boolean {
-    return !!localStorage.getItem(ACCESS_KEY);
-  },
-
-  async refreshToken(): Promise<boolean> {
-    const refresh = localStorage.getItem(REFRESH_KEY);
-    if (!refresh) return false;
-    try {
-      const { data } = await axios.post<{ access: string }>('/api/token/refresh/', { refresh });
-      localStorage.setItem(ACCESS_KEY, data.access);
-      return true;
-    } catch {
-      this.logout();
-      return false;
-    }
-  },
+export const login = async (username: string, password: string): Promise<AuthTokens> => {
+  const response = await axios.post<AuthTokens>(`${API_URL}/api/auth/token/`, {
+    username,
+    password,
+  });
+  return response.data;
 };
+
+export const saveTokens = (tokens: AuthTokens): void => {
+  localStorage.setItem('access_token', tokens.access);
+  localStorage.setItem('refresh_token', tokens.refresh);
+};
+
+export const getAccessToken = (): string | null => localStorage.getItem('access_token');
+
+export const logout = (): void => {
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
+};
+
+export const isAuthenticated = (): boolean => !!getAccessToken();
