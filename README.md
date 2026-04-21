@@ -40,8 +40,8 @@ Al iniciar, el backend automáticamente:
 | Servicio | URL |
 |---------|-----|
 | Frontend (React) | http://localhost:3000 |
-| Backend API | http://localhost:8000/api/ |
-| Django Admin | http://localhost:8000/admin/ |
+| Backend API | http://localhost:8001/api/ |
+| Django Admin | http://localhost:8001/admin/ |
 
 ---
 
